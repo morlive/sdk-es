@@ -1,0 +1,118 @@
+switch-simulator-architecture.txt
+
+switch-simulator/
+├── bsp/                              # Board Support Package - поддержка аппаратной платформы
+│   ├── include/                      # Заголовочные файлы BSP
+│   │   └── bsp.h                     # Главный интерфейс BSP
+│   └── src/                          # Исходный код BSP
+│       ├── bsp_config.c              # Конфигурация BSP для различных плат
+│       ├── bsp_drivers.c             # Интеграция BSP с драйверами
+│       └── bsp_init.c                # Инициализация BSP при старте системы
+├── build/                            # Директория для скомпилированных файлов
+├── doc/                              # Документация
+│   ├── api/                          # Документация по API
+│   │   ├── cli_api.md                # Документация по CLI API
+│   │   ├── hal_api.md                # Документация по HAL API
+│   │   └── sai_api.md                # Документация по SAI API
+│   ├── architecture/                 # Архитектурные документы
+│   │   ├── component_diagrams/       # Диаграммы компонентов системы
+│   │   └── high_level_design.md      # Дизайн высокого уровня
+│   └── user_guide.md                 # Руководство пользователя
+├── drivers/                          # Драйверы для аппаратных компонентов
+│   ├── include/                      # Заголовочные файлы драйверов
+│   │   ├── ethernet_driver.h         # Интерфейс драйвера Ethernet
+│   │   └── sim_driver.h              # Интерфейс драйвера симуляции
+│   └── src/                          # Исходный код драйверов
+│       ├── ethernet_driver.c         # Реализация драйвера Ethernet
+│       └── sim_driver.c              # Реализация драйвера симуляции
+├── include/                          # Публичные заголовочные файлы
+│   ├── common/                       # Общие определения
+│   │   ├── error_codes.h             # Коды ошибок
+│   │   ├── logging.h                 # Интерфейс логирования
+│   │   └── types.h                   # Базовые типы данных
+│   ├── hal/                          # Интерфейс аппаратной абстракции
+│   │   ├── hw_resources.h            # Абстракция аппаратных ресурсов
+│   │   ├── packet.h                  # Интерфейс обработки пакетов
+│   │   └── port.h                    # Интерфейс управления портами
+│   ├── l2/                           # L2 функциональность
+│   │   ├── mac_table.h               # Интерфейс таблицы MAC-адресов
+│   │   ├── stp.h                     # Интерфейс Spanning Tree Protocol
+│   │   └── vlan.h                    # Интерфейс VLAN 
+│   ├── l3/                           # L3 функциональность
+│   │   ├── ip.h                      # Интерфейс обработки IP
+│   │   ├── routing_protocols.h       # Интерфейс протоколов маршрутизации
+│   │   └── routing_table.h           # Интерфейс таблицы маршрутизации
+│   ├── management/                   # Управление устройством
+│   │   ├── cli.h                     # Интерфейс командной строки
+│   │   └── stats.h                   # Интерфейс сбора статистики
+│   └── sai/                          # Switch Abstraction Interface
+│       ├── sai_port.h                # SAI для управления портами
+│       ├── sai_route.h               # SAI для маршрутизации
+│       └── sai_vlan.h                # SAI для управления VLAN
+├── python/                           # Python интерфейс
+│   ├── api/                          # Python API для управления симулятором
+│   │   ├── __init__.py               # Инициализация модуля API
+│   │   ├── stats_viewer.py           # Просмотр статистики через Python
+│   │   └── switch_controller.py      # Управление коммутатором через Python
+│   └── cli/                          # Реализация CLI на Python
+│       ├── commands/                 # Команды CLI
+│       │   ├── __init__.py           # Инициализация модуля команд
+│       │   ├── port_commands.py      # Команды для управления портами
+│       │   ├── routing_commands.py   # Команды для маршрутизации
+│       │   └── vlan_commands.py      # Команды для управления VLAN
+│       ├── cli_main.py               # Основной модуль CLI
+│       ├── cli_parser.py             # Парсер команд CLI
+│       └── __init__.py               # Инициализация модуля CLI
+├── src/                              # Исходный код
+│   ├── common/                       # Общие функции
+│   │   ├── logging.c                 # Реализация логирования
+│   │   └── utils.c                   # Служебные утилиты
+│   ├── hal/                          # Реализация HAL
+│   │   ├── hw_simulation.c           # Симуляция аппаратных компонентов
+│   │   ├── packet.c                  # Обработка пакетов
+│   │   └── port.c                    # Управление портами
+│   ├── l2/                           # Реализация L2 функций
+│   │   ├── mac_learning.c            # Механизм изучения MAC-адресов
+│   │   ├── mac_table.c               # Таблица MAC-адресов
+│   │   ├── stp.c                     # Реализация Spanning Tree Protocol
+│   │   └── vlan.c                    # Реализация VLAN
+│   ├── l3/                           # Реализация L3 функций
+│   │   ├── routing_protocols/        # Протоколы маршрутизации
+│   │   │   ├── ospf.c                # Реализация OSPF
+│   │   │   └── rip.c                 # Реализация RIP
+│   │   ├── arp.c                     # Реализация ARP протокола
+│   │   ├── ip_processing.c           # Обработка IP-пакетов
+│   │   └── routing_table.c           # Таблица маршрутизации
+│   ├── management/                   # Модули управления
+│   │   ├── cli_engine.c              # Движок командной строки
+│   │   ├── config_manager.c          # Управление конфигурацией
+│   │   └── stats_collector.c         # Сбор статистики
+│   ├── sai/                          # Реализация SAI
+│   │   ├── sai_adapter.c             # Адаптер SAI к внутренним функциям
+│   │   ├── sai_port.c                # SAI для портов
+│   │   ├── sai_route.c               # SAI для маршрутизации
+│   │   └── sai_vlan.c                # SAI для VLAN
+│   └── main.c                        # Точка входа в программу
+├── tests/                            # Тесты
+│   ├── integration/                  # Интеграционные тесты
+│   │   ├── test_l2_switching.c       # Тест L2 коммутации
+│   │   └── test_l3_routing.c         # Тест L3 маршрутизации
+│   ├── system/                       # Системные тесты
+│   │   ├── test_network_scenarios.py # Тестирование сетевых сценариев
+│   │   └── test_performance.py       # Тестирование производительности
+│   └── unit/                         # Модульные тесты
+│       ├── test_mac_table.c          # Тест таблицы MAC-адресов
+│       ├── test_routing.c            # Тест маршрутизации
+│       └── test_vlan.c               # Тест VLAN
+├── tools/                            # Инструменты
+│   ├── scripts/                      # Скрипты
+│   │   ├── build.sh                  # Скрипт сборки
+│   │   └── test_runner.py            # Запуск тестов
+│   └── simulators/                   # Симуляторы
+│       ├── network_topology.py       # Симулятор сетевой топологии
+│       └── traffic_generator.c       # Генератор сетевого трафика
+├── CMakeLists.txt                    # Файл сборки CMake
+├── LICENSE                           # Лицензия проекта
+├── Makefile                          # Makefile для сборки
+└── README.md                         # Описание проекта
+
