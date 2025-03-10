@@ -10,10 +10,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-
-/**
- * @brief Status codes for API function returns
- */
 typedef enum
 {
   STATUS_SUCCESS = 0,             /**< Operation completed successfully */
@@ -27,7 +23,6 @@ typedef enum
   STATUS_ALREADY_EXISTS,          /**< Entry already exists */
   STATUS_NOT_FOUND,               /**< Entry not found */
 } status_t;
-
 
 typedef struct 
 {
