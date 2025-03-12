@@ -3,7 +3,8 @@
 ### Base directory structure
 
 
-![](docs/Hierarchical_Network_Model.svg)
+| ![](docs/Hierarchical_Network_Model.svg) |
+|---|
 <hr />
 <img src="docs/Hierarchical_Network_Model.svg" alt="Network Model" width="50%" />
 <hr />
