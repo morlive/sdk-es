@@ -8,8 +8,10 @@
 
 #include "types.h"
 
-typedef enum 
-{
+/**
+ * @brief Component identifiers for error code generation
+ */
+typedef enum {
     COMPONENT_GENERAL = 0,     /**< General/system level */
     COMPONENT_HAL,             /**< Hardware Abstraction Layer */
     COMPONENT_BSP,             /**< Board Support Package */
@@ -21,8 +23,50 @@ typedef enum
     COMPONENT_MAX              /**< Maximum component identifier */
 } component_id_t;
 
-enum 
-{
+/**
+ * @brief Generate error code based on component and specific error
+ * 
+ * Format: [31:24] - Reserved
+ *         [23:16] - Component ID
+ *         [15:0]  - Error code
+ *
+ * @param component Component identifier
+ * @param error Specific error code
+ * @return uint32_t Combined error code
+ */
+#define MAKE_ERROR_CODE(component, error) \
+    ((uint32_t)(((component) & 0xFF) << 16) | ((error) & 0xFFFF))
+
+/**
+ * @brief Extract component ID from error code
+ * 
+ * @param error_code Combined error code
+ * @return component_id_t Component identifier
+ */
+#define GET_ERROR_COMPONENT(error_code) \
+    ((component_id_t)(((error_code) >> 16) & 0xFF))
+
+/**
+ * @brief Extract specific error from error code
+ * 
+ * @param error_code Combined error code
+ * @return uint16_t Specific error code
+ */
+#define GET_ERROR_CODE(error_code) \
+    ((uint16_t)((error_code) & 0xFFFF))
+
+/**
+ * @brief Convert error code to human-readable string
+ * 
+ * @param error_code Error code to convert
+ * @return const char* Human readable string
+ */
+const char* error_to_string(uint32_t error_code);
+
+/**
+ * @brief Common error codes for all components
+ */
+enum {
     ERROR_NONE = 0,                /**< No error */
     ERROR_INVALID_PARAMETER,       /**< Invalid parameter */
     ERROR_RESOURCE_UNAVAILABLE,    /**< Resource not available */
@@ -39,4 +83,3 @@ enum
 };
 
 #endif /* SWITCH_SIM_ERROR_CODES_H */
-
