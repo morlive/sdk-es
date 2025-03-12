@@ -3,7 +3,8 @@
 ### Base directory structure
 
 
-![].(docs/Hierarchical_Network_Model.svg)
+![](docs/Hierarchical_Network_Model.svg)
+
 
 
 ```bash
