@@ -4,6 +4,13 @@
 
 
 ![](docs/Hierarchical_Network_Model.svg)
+<hr />
+<img src="docs/Hierarchical_Network_Model.svg" alt="Network Model" width="50%" />
+<hr />
+<div style="display: flex; align-items: center;">
+    <img src="docs/Hierarchical_Network_Model.svg" alt="Network Model" width="40%" style="margin-right: 20px;">
+    <p>Это описание схемы, размещенное справа от изображения.</p>
+</div>
 
 
 
