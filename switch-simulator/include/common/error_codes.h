@@ -11,7 +11,8 @@
 /**
  * @brief Component identifiers for error code generation
  */
-typedef enum {
+typedef enum 
+{
     COMPONENT_GENERAL = 0,     /**< General/system level */
     COMPONENT_HAL,             /**< Hardware Abstraction Layer */
     COMPONENT_BSP,             /**< Board Support Package */
@@ -66,7 +67,8 @@ const char* error_to_string(uint32_t error_code);
 /**
  * @brief Common error codes for all components
  */
-enum {
+enum 
+{
     ERROR_NONE = 0,                /**< No error */
     ERROR_INVALID_PARAMETER,       /**< Invalid parameter */
     ERROR_RESOURCE_UNAVAILABLE,    /**< Resource not available */
