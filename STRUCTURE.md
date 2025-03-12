@@ -1,3 +1,5 @@
+
+```bash
 switch-simulator-architecture.md
 
 switch-simulator/
@@ -115,3 +117,4 @@ switch-simulator/
 ├── LICENSE                           # Лицензия проекта
 ├── Makefile                          # Makefile для сборки
 └── README.md                         # Описание проекта
+```
