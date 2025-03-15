@@ -207,7 +207,8 @@ status_t stp_clear_port_stats(port_id_t port_id);
  * @param bpdu BPDU packet data
  * @return status_t STATUS_SUCCESS on success
  */
-status_t stp_process_bpdu(port_id_t port_id, stp_bpdu_t *bpdu);
+//status_t stp_process_bpdu(port_id_t port_id, stp_bpdu_t *bpdu);
+status_t stp_process_bpdu(port_id_t port_id, const stp_bpdu_t *bpdu);
 
 /**
  * @brief Manually trigger a topology change notification
