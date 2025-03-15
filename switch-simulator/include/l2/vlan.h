@@ -202,6 +202,17 @@ typedef enum {
     VLAN_TAG_ACTION_REPLACE     /**< Replace VLAN tag */
 } vlan_tag_action_t;
 
+/**
+ * @brief Process a packet for VLAN handling (tagging/untagging)
+ *
+ * @param packet_info Packet information
+ * @param in_port Input port
+ * @param out_port Output port
+ * @param out_vlan_id Output parameter to store egress VLAN ID
+ * @param tag_action Output parameter to indicate required tag action
+ * @return status_t STATUS_SUCCESS if packet should be forwarded,
+ *                 error code otherwise
+ */
 status_t vlan_process_packet(packet_info_t *packet_info, 
                            port_id_t in_port, 
                            port_id_t out_port,
@@ -223,11 +234,27 @@ typedef enum {
     VLAN_EVENT_CONFIG_CHANGE    /**< VLAN configuration changed */
 } vlan_event_type_t;
 
+/**
+ * @brief Callback function type for VLAN events
+ *
+ * @param vlan_id VLAN identifier related to the event
+ * @param event_type Type of VLAN event that occurred
+ * @param port_id Port identifier (valid only for port-related events)
+ * @param user_data User data passed during callback registration
+ */
 typedef void (*vlan_event_callback_t)(vlan_id_t vlan_id, 
                                     vlan_event_type_t event_type, 
                                     port_id_t port_id,  /* Valid for port events */
                                     void *user_data);
-                                    
+
+/**
+ * @brief Register callback for VLAN events
+ *
+ * @param callback Function to call when VLAN events occur
+ * @param user_data User data to pass to callback
+ * @return status_t STATUS_SUCCESS on success,
+ *                 STATUS_INVALID_PARAMETER if callback is NULL
+ */
 status_t vlan_register_event_callback(vlan_event_callback_t callback, void *user_data);
 
 #endif /* SWITCH_SIM_VLAN_H */
