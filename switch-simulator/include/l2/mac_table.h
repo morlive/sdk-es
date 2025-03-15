@@ -50,6 +50,19 @@ typedef struct {
 } mac_table_config_t;
 
 /**
+ * @brief Callback function type for MAC address table events
+ *
+ * This callback is invoked when MAC address entries are added, updated, or deleted
+ * in the MAC address table. It allows subscribers to react to changes in the
+ * MAC address table in real-time.
+ *
+ * @param entry Pointer to the MAC table entry that was changed
+ * @param is_added true if the entry was added or updated, false if it was deleted
+ * @param user_data User-provided context data passed during callback registration
+ */
+typedef void (*mac_event_callback_t)(mac_table_entry_t *entry, bool is_added, void *user_data);
+
+/**
  * @brief Initialize the MAC address table
  * 
  * @param config Configuration parameters
@@ -63,6 +76,15 @@ status_t mac_table_init(mac_table_config_t *config);
  * @return status_t STATUS_SUCCESS on success
  */
 status_t mac_table_deinit(void);
+
+/**
+ * @brief Check if MAC table has sufficient resources for new entries
+ * 
+ * @param count Number of entries to check
+ * @param available Output parameter set to true if resources are available
+ * @return status_t STATUS_SUCCESS on success
+ */
+status_t mac_table_check_resources(uint32_t count, bool *available);
 
 /**
  * @brief Add a static entry to the MAC table
@@ -107,7 +129,38 @@ status_t mac_table_lookup(mac_addr_t mac_addr, vlan_id_t vlan_id, mac_table_entr
  * status_t mac_table_learn(const packet_metadata_t *metadata, port_id_t port_id);
  *
  */
-
+/* Выбор между -
+ * status_t mac_table_learn(packet_buffer_t *packet, port_id_t port_id);
+ * или 
+ * status_t mac_table_learn(const packet_metadata_t *metadata, port_id_t port_id);
+ *
+ * Преимущества:
+ * status_t mac_table_learn(packet_buffer_t *packet, port_id_t port_id);
+ *
+ * - Даёт доступ ко всему пакету, включая как метаданные, так и содержимое
+ * - Позволяет при необходимости анализировать не только заголовки, 
+ *   но и полезную нагрузку
+ * - Соответствует типу, определенному в packet.h
+ *
+ *
+ * Преимущества:
+ * status_t mac_table_learn(const packet_metadata_t *metadata, port_id_t port_id);
+ *
+ * - Более эффективен - передаёт только необходимые метаданные, а не весь пакет
+ * - Чётко показывает, что для обучения MAC-адресам нужны только заголовки
+ * - Использует константный указатель, что предотвращает модификацию метаданных
+ * - Лучше соответствует принципу наименьших привилегий
+ * 
+ *   * Рекомендуется использовать второй вариант по следующим причинам:
+ *    - Для MAC-обучения обычно требуются только метаданные пакета (MAC-адрес источника, VLAN ID)
+ *    - Передача только метаданных делает функцию более эффективной и менее ресурсоемкой
+ *    - Константный указатель ясно указывает, что функция только читает метаданные, не изменяя их
+ *    - Это соответствует принципу разделения ответственности - функция получает именно те данные,
+ *      которые ей нужны
+ *    - Даёт доступ ко всему пакету, включая как метаданные, так и содержимое
+ *    - Позволяет при необходимости анализировать не только заголовки, но и полезную нагрузку
+ *    - Соответствует типу, определенному в packet.h
+ */
 /** <d1:under_developing>
  * @brief Process MAC learning for an incoming packet
  * 
@@ -117,9 +170,7 @@ status_t mac_table_lookup(mac_addr_t mac_addr, vlan_id_t vlan_id, mac_table_entr
  */
 status_t mac_table_learn(packet_info_t *packet, port_id_t port_id);
 
-
 /* end_err:d1> */
-
 
 /**
  * @brief Get destination port for forwarding a packet
@@ -161,6 +212,14 @@ status_t mac_table_process_aging(void);
 status_t mac_table_get_count(uint32_t *count);
 
 /**
+ * @brief Get MAC table resource usage
+ *
+ * @param usage Output parameter to store usage information
+ * @return status_t STATUS_SUCCESS on success
+ */
+status_t mac_table_get_resource_usage(hw_resource_usage_t *usage);
+
+/**
  * @brief Get all entries in the MAC table
  * 
  * @param entries Array to store MAC table entries
@@ -187,6 +246,22 @@ status_t mac_table_configure_port_learning(port_id_t port_id, bool enable);
  * @return status_t STATUS_SUCCESS on success
  */
 typedef void (*mac_event_callback_t)(mac_table_entry_t *entry, bool is_added, void *user_data);
+
+/**
+ * @brief Register callback for MAC address change events
+ * 
+ * @param callback Function to call when MAC events occur
+ * @param user_data User data to pass to callback
+ * @return status_t STATUS_SUCCESS on success
+ */
 status_t mac_table_register_event_callback(mac_event_callback_t callback, void *user_data);
+
+/**
+ * @brief Unregister previously registered MAC event callback
+ * 
+ * @return status_t STATUS_SUCCESS on success
+ */
+status_t mac_table_unregister_event_callback(void);
+
 
 #endif /* SWITCH_SIM_MAC_TABLE_H */
