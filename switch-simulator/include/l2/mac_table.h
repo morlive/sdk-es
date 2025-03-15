@@ -93,7 +93,22 @@ status_t mac_table_delete_entry(mac_addr_t mac_addr, vlan_id_t vlan_id);
  */
 status_t mac_table_lookup(mac_addr_t mac_addr, vlan_id_t vlan_id, mac_table_entry_t *entry);
 
-/**
+
+/* <d1:begin_err -------------------------------------------------- */
+/* Небольшая проблема:
+ * В функции mac_table_learn используется тип packet_info_t, 
+ * который не определен в предоставленных заголовочных файлах. 
+ * Вероятно, вы имели в виду packet_buffer_t из packet.h или packet_metadata_t
+ *
+ * Рекомендации:
+ * Исправление типа в функции mac_table_learn:
+ * status_t mac_table_learn(packet_buffer_t *packet, port_id_t port_id);
+ * или 
+ * status_t mac_table_learn(const packet_metadata_t *metadata, port_id_t port_id);
+ *
+ */
+
+/** <d1:under_developing>
  * @brief Process MAC learning for an incoming packet
  * 
  * @param packet Packet information
@@ -101,6 +116,10 @@ status_t mac_table_lookup(mac_addr_t mac_addr, vlan_id_t vlan_id, mac_table_entr
  * @return status_t STATUS_SUCCESS on success, error code otherwise
  */
 status_t mac_table_learn(packet_info_t *packet, port_id_t port_id);
+
+
+/* end_err:d1> */
+
 
 /**
  * @brief Get destination port for forwarding a packet
