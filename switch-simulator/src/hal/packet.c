@@ -1,6 +1,10 @@
 /**
  * @file packet.c
  * @brief Implementation of packet processing interface for switch simulator
+ *
+ * This file implements the packet processing subsystem for a switch simulator.
+ * It provides functions for packet buffer management, packet processing,
+ * and packet handling (transmission, reception, injection).
  */
 #include "../include/hal/packet.h"
 #include "../include/common/logging.h"
@@ -55,6 +59,8 @@ static volatile int g_processor_lock = 0;
 
 /**
  * @brief Simple lock acquisition function
+ *
+ * Acquires a lock to protect critical sections of code from concurrent access.
  * In a real implementation, this would use proper synchronization primitives
  */
 static inline void acquire_lock(void) {
@@ -67,6 +73,8 @@ static inline void acquire_lock(void) {
 
 /**
  * @brief Simple lock release function
+ *
+ * Releases a lock previously acquired with acquire_lock().
  * In a real implementation, this would use proper synchronization primitives
  */
 static inline void release_lock(void) {
@@ -77,6 +85,10 @@ static inline void release_lock(void) {
 
 /**
  * @brief Check validity of a packet buffer
+ *
+ * Performs basic validation of a packet buffer structure to ensure
+ * it has valid properties before operations are performed on it.
+ *
  * @param packet Packet buffer to validate
  * @return true if packet is valid, false otherwise
  */
@@ -90,6 +102,13 @@ static bool packet_buffer_is_valid(const packet_buffer_t *packet) {
 
 /**
  * @brief Compare function for sorting processors by priority
+ *
+ * Used as a comparison function for qsort() to sort packet processors
+ * by their priority values.
+ *
+ * @param a Pointer to first processor to compare
+ * @param b Pointer to second processor to compare
+ * @return Integer result of comparison (negative if a < b, 0 if a == b, positive if a > b)
  */
 static int compare_processors(const void *a, const void *b) {
     const packet_processor_t *p1 = (const packet_processor_t *)a;
@@ -101,11 +120,22 @@ static int compare_processors(const void *a, const void *b) {
 
 /**
  * @brief Sort processors by priority
+ *
+ * Sorts the array of packet processors by their priority values
+ * to ensure they are processed in the correct order.
  */
 static void sort_processors(void) {
     qsort(g_processors, g_processor_count, sizeof(packet_processor_t), compare_processors);
 }
 
+/**
+ * @brief Initialize the packet processing subsystem
+ *
+ * Initializes the packet processing subsystem, preparing it for use.
+ * This function must be called before any other packet processing functions.
+ *
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_init(void) {
     LOG_INFO(LOG_CATEGORY_HAL, "Initializing packet processing subsystem");
     
@@ -124,6 +154,14 @@ status_t packet_init(void) {
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief Shut down the packet processing subsystem
+ * 
+ * Shuts down the packet processing subsystem, freeing all resources
+ * and deregistering all packet processors.
+ * 
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_shutdown(void) {
     LOG_INFO(LOG_CATEGORY_HAL, "Shutting down packet processing subsystem");
     
@@ -147,6 +185,15 @@ status_t packet_shutdown(void) {
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief Allocate a new packet buffer
+ *
+ * Allocates a new packet buffer with the specified capacity.
+ * The buffer is initialized with default metadata values.
+ *
+ * @param size Capacity of the new packet buffer in bytes
+ * @return Pointer to the newly allocated packet buffer, or NULL on failure
+ */
 packet_buffer_t* packet_buffer_alloc(uint32_t size) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -191,6 +238,14 @@ packet_buffer_t* packet_buffer_alloc(uint32_t size) {
     return packet;
 }
 
+/**
+ * @brief Free a packet buffer
+ * 
+ * Frees a packet buffer previously allocated with packet_buffer_alloc().
+ * This function securely clears the packet data before freeing the memory.
+ * 
+ * @param packet Pointer to the packet buffer to free
+ */
 void packet_buffer_free(packet_buffer_t *packet) {
     if (!packet) {
         LOG_WARNING(LOG_CATEGORY_HAL, "Attempted to free NULL packet buffer");
@@ -214,6 +269,16 @@ void packet_buffer_free(packet_buffer_t *packet) {
     LOG_DEBUG(LOG_CATEGORY_HAL, "Freed packet buffer");
 }
 
+/**
+ * @brief Clone a packet buffer
+ * 
+ * Creates a new packet buffer that is a copy of the original.
+ * The new buffer has the same size, capacity, and content as the original.
+ * Metadata is also copied, but user data is not.
+ * 
+ * @param packet Pointer to the packet buffer to clone
+ * @return Pointer to the newly allocated clone, or NULL on failure
+ */
 packet_buffer_t* packet_buffer_clone(const packet_buffer_t *packet) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -246,6 +311,17 @@ packet_buffer_t* packet_buffer_clone(const packet_buffer_t *packet) {
     return clone;
 }
 
+/**
+ * @brief Resize a packet buffer
+ * 
+ * Resizes a packet buffer to the specified size. If the new size fits within
+ * the current capacity, no memory reallocation is performed. Otherwise,
+ * the buffer is reallocated to the new size.
+ * 
+ * @param packet Pointer to the packet buffer to resize
+ * @param new_size New size for the packet buffer in bytes
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_buffer_resize(packet_buffer_t *packet, uint32_t new_size) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -285,6 +361,19 @@ status_t packet_buffer_resize(packet_buffer_t *packet, uint32_t new_size) {
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief Register a packet processor
+ * 
+ * Registers a callback function to process packets. The callback will be
+ * called when packets are processed, in order of priority (lower priority
+ * values are processed first).
+ * 
+ * @param callback Function to call for packet processing
+ * @param priority Priority of the processor (lower values are processed first)
+ * @param user_data User data to pass to the callback
+ * @param handle_out Pointer to store the handle for the registered processor
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_register_processor(packet_process_cb_t callback, 
                                   uint32_t priority, 
                                   void *user_data, 
@@ -347,6 +436,16 @@ status_t packet_register_processor(packet_process_cb_t callback,
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief Unregister a packet processor
+ * 
+ * Unregisters a packet processor previously registered with packet_register_processor().
+ * After this function returns successfully, the processor will no longer be called
+ * during packet processing.
+ * 
+ * @param handle Handle of the processor to unregister
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_unregister_processor(uint32_t handle) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -390,6 +489,16 @@ status_t packet_unregister_processor(uint32_t handle) {
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief Process a packet through registered processors
+ * 
+ * Processes a packet through all registered packet processors in priority order.
+ * Processing continues until one of the processors drops or consumes the packet,
+ * or all processors have been called.
+ * 
+ * @param packet Pointer to the packet buffer to process
+ * @return Result of packet processing (FORWARD, DROP, CONSUME, RECIRCULATE)
+ */
 packet_result_t packet_process(packet_buffer_t *packet) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -461,6 +570,16 @@ packet_result_t packet_process(packet_buffer_t *packet) {
     return result;
 }
 
+/**
+ * @brief Inject a packet into the processing pipeline
+ *
+ * Injects a packet into the processing pipeline as if it were generated
+ * internally by the switch. The packet is processed by all registered
+ * packet processors in priority order.
+ *
+ * @param packet Pointer to the packet buffer to inject
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_inject(packet_buffer_t *packet) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -507,6 +626,16 @@ status_t packet_inject(packet_buffer_t *packet) {
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief Transmit a packet on a specific port
+ *
+ * Transmits a packet on the specified port. This function checks that the
+ * port is valid and operational before attempting transmission.
+ *
+ * @param packet Pointer to the packet buffer to transmit
+ * @param port_id ID of the port to transmit on
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_transmit(packet_buffer_t *packet, port_id_t port_id) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -558,6 +687,16 @@ status_t packet_transmit(packet_buffer_t *packet, port_id_t port_id) {
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief Process a received packet
+ * 
+ * Processes a packet that has been received on the specified port.
+ * The packet is processed by all registered packet processors in priority order.
+ * 
+ * @param packet Pointer to the packet buffer that was received
+ * @param port_id ID of the port the packet was received on
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_receive(packet_buffer_t *packet, port_id_t port_id) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -628,6 +767,10 @@ status_t packet_receive(packet_buffer_t *packet, port_id_t port_id) {
 
 /**
  * @brief Function to handle incoming packets from hardware simulation
+ *
+ * Handles a packet that has been received from the hardware simulation.
+ * This function determines the source port and processes the packet.
+ *
  * @param packet Incoming packet buffer
  * @return Status code
  */
@@ -655,6 +798,18 @@ status_t packet_handle_incoming(packet_buffer_t *packet) {
     return packet_receive(packet, port_id);
 }
 
+/**
+ * @brief Extract a header from a packet
+ * 
+ * Extracts a block of data from a packet at the specified offset.
+ * The data is copied to the provided header buffer.
+ * 
+ * @param packet Pointer to the packet buffer to extract from
+ * @param offset Offset in bytes from the start of the packet
+ * @param header Pointer to buffer to store the extracted header
+ * @param size Size of the header to extract in bytes
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_get_header(packet_buffer_t *packet, uint32_t offset, void *header, uint32_t size) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -679,6 +834,18 @@ status_t packet_get_header(packet_buffer_t *packet, uint32_t offset, void *heade
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief Write a header to a packet
+ *
+ * Writes a block of data to a packet at the specified offset.
+ * The data is copied from the provided header buffer.
+ *
+ * @param packet Pointer to the packet buffer to write to
+ * @param offset Offset in bytes from the start of the packet
+ * @param header Pointer to buffer containing the header data
+ * @param size Size of the header to write in bytes
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_set_header(packet_buffer_t *packet, uint32_t offset, const void *header, uint32_t size) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -703,6 +870,19 @@ status_t packet_set_header(packet_buffer_t *packet, uint32_t offset, const void 
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief Insert data into a packet
+ * 
+ * Inserts a block of data into a packet at the specified offset.
+ * This function will resize the packet if necessary to accommodate the new data.
+ * Existing data at and after the offset is moved to make room for the new data.
+ * 
+ * @param packet Pointer to the packet buffer to insert into
+ * @param offset Offset in bytes from the start of the packet
+ * @param data Pointer to buffer containing the data to insert
+ * @param size Size of the data to insert in bytes
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_insert(packet_buffer_t *packet, uint32_t offset, const void *data, uint32_t size) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
@@ -745,6 +925,17 @@ status_t packet_insert(packet_buffer_t *packet, uint32_t offset, const void *dat
     return STATUS_SUCCESS;
 }
 
+/**
+ * @brief Remove data from a packet
+ *
+ * Removes a block of data from a packet at the specified offset.
+ * Data after the removed block is moved up to fill the gap.
+ *
+ * @param packet Pointer to the packet buffer to remove data from
+ * @param offset Offset in bytes from the start of the packet
+ * @param size Size of the data to remove in bytes
+ * @return STATUS_SUCCESS on success, appropriate error code otherwise
+ */
 status_t packet_remove(packet_buffer_t *packet, uint32_t offset, uint32_t size) {
     if (!g_initialized) {
         LOG_ERROR(LOG_CATEGORY_HAL, "Packet processing subsystem not initialized");
