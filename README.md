@@ -32,14 +32,15 @@ Detailed project structure is available in [STRUCTURE.md](STRUCTURE.md).
 
 > ### Requirements
 <hr />
-- Linux-compatible OS
+>- Linux-compatible OS
+
 >- GCC 8.0+ or Clang 9.0+
 >- CMake 3.10+
 >- Python 3.8+
 >- Ninja (optional)
 
 <hr />
-- ### Installation
+>- ### Installation
 
 >- ``bash
 >- Clone the repository
