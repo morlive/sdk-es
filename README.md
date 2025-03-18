@@ -33,17 +33,25 @@ Detailed project structure is available in [STRUCTURE.md](STRUCTURE.md).
 ## Getting Started
 
 > ### Requirements
+
 <hr />
+
 > Linux-compatible OS
-
->- GCC 8.0+ or Clang 9.0+
->- CMake 3.10+
->- Python 3.8+
->- Ninja (optional)
+>>
+>>- GCC 8.0+ or Clang 9.0+
+>>- CMake 3.10+
+>>- Python 3.8+
+>>- Ninja (optional)
+>>
+>>  ---
+>> 
+>>  compiler gcc
+>>  ansi | c89 | posix 
 
 <hr />
-> ### Installation
 
+> ### Installation
+>
 >- ``bash
 >- Clone the repository
 >- git clone https://github.com/morrisel/sdk-es.git
