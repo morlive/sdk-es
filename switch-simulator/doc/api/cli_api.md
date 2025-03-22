@@ -1,115 +1,145 @@
-switch-simulator/
-├── bsp/
-│   ├── include/
-│   │   └── bsp.h             # Заголовочные файлы BSP
-│   └── src/
-│       ├── bsp_init.c        # Инициализация аппаратной платформы
-│       ├── bsp_config.c      # Конфигурация аппаратных параметров
-│       └── bsp_drivers.c     # Драйверы для базовых функций оборудования
-├── drivers/
-│   ├── include/
-│   │   ├── ethernet_driver.h # Интерфейс драйвера для Ethernet
-│   │   └── sim_driver.h      # Интерфейс драйвера для аппаратной симуляции
-│   └── src/
-│       ├── ethernet_driver.c # Реализация драйвера Ethernet
-│       └── sim_driver.c      # Реализация драйвера симуляции  
-├── build/                      # Директория для скомпилированных файлов
-├── doc/                        # Документация
-│   ├── architecture/           # Архитектурные документы
-│   │   ├── high_level_design.md
-│   │   └── component_diagrams/
-│   ├── api/                    # Документация по API
-│   │   ├── hal_api.md
-│   │   ├── sai_api.md
-│   │   └── cli_api.md
-│   └── user_guide.md
-├── include/                    # Публичные заголовочные файлы
-│   ├── common/                 # Общие определения
-│   │   ├── types.h             # Базовые типы данных
-│   │   ├── error_codes.h       # Коды ошибок
-│   │   └── logging.h           # Интерфейс логирования
-│   ├── hal/                    # Интерфейс аппаратной абстракции
-│   │   ├── port.h              # Абстракция портов
-│   │   ├── packet.h            # Обработка пакетов
-│   │   └── hw_resources.h      # Виртуальные ресурсы оборудования
-│   ├── l2/                     # L2 функциональность
-│   │   ├── mac_table.h         # Таблица MAC-адресов
-│   │   ├── vlan.h              # VLAN функциональность
-│   │   └── stp.h               # Spanning Tree Protocol
-│   ├── l3/                     # L3 функциональность
-│   │   ├── routing_table.h     # Таблица маршрутизации
-│   │   ├── ip.h                # Обработка IP-пакетов
-│   │   └── routing_protocols.h # Интерфейс протоколов маршрутизации
-│   ├── sai/                    # Switch Abstraction Interface
-│   │   ├── sai_port.h
-│   │   ├── sai_vlan.h
-│   │   └── sai_route.h
-│   └── management/             # Управление устройством
-│       ├── cli.h               # Интерфейс для CLI
-│       └── stats.h             # Интерфейс статистики
-├── src/                        # Исходный код
-│   ├── common/                 # Общая функциональность
-│   │   ├── logging.c
-│   │   └── utils.c
-│   ├── hal/                    # Реализация HAL
-│   │   ├── port.c
-│   │   ├── packet.c
-│   │   └── hw_simulation.c     # Симуляция аппаратных компонентов
-│   ├── l2/                     # Реализация L2
-│   │   ├── mac_learning.c
-│   │   ├── mac_table.c
-│   │   ├── vlan.c
-│   │   └── stp.c
-│   ├── l3/                     # Реализация L3
-│   │   ├── routing_table.c
-│   │   ├── ip_processing.c
-│   │   ├── arp.c
-│   │   └── routing_protocols/
-│   │       ├── rip.c
-│   │       └── ospf.c
-│   ├── sai/                    # Реализация SAI
-│   │   ├── sai_adapter.c       # Адаптер SAI к HAL
-│   │   ├── sai_port.c
-│   │   ├── sai_vlan.c
-│   │   └── sai_route.c
-│   ├── management/             # Управление и мониторинг
-│   │   ├── cli_engine.c        # Движок CLI
-│   │   ├── stats_collector.c   # Сбор статистики
-│   │   └── config_manager.c    # Управление конфигурацией
-│   └── main.c                  # Точка входа
-├── tools/                      # Инструменты
-│   ├── simulators/             # Симуляторы
-│   │   ├── traffic_generator.c # Генератор трафика
-│   │   └── network_topology.py # Симулятор топологии
-│   └── scripts/                # Скрипты
-│       ├── build.sh            # Скрипт сборки
-│       └── test_runner.py      # Запуск тестов
-├── python/                     # Python интерфейс
-│   ├── cli/                    # CLI реализация
-│   │   ├── __init__.py
-│   │   ├── commands/           # Команды CLI
-│   │   │   ├── __init__.py
-│   │   │   ├── port_commands.py
-│   │   │   ├── vlan_commands.py
-│   │   │   └── routing_commands.py
-│   │   ├── cli_main.py         # Главный модуль CLI
-│   │   └── cli_parser.py       # Парсер команд
-│   └── api/                    # Python API
-│       ├── __init__.py
-│       ├── switch_controller.py # Контроллер коммутатора
-│       └── stats_viewer.py     # Просмотр статистики
-├── tests/                      # Тесты
-│   ├── unit/                   # Модульные тесты
-│   │   ├── test_mac_table.c
-│   │   ├── test_routing.c
-│   │   └── test_vlan.c
-│   ├── integration/            # Интеграционные тесты
-│   │   ├── test_l2_switching.c
-│   │   └── test_l3_routing.c
-│   └── system/                 # Системные тесты
-│       ├── test_performance.py
-│       └── test_network_scenarios.py
-├── CMakeLists.txt              # Файл сборки CMake
-├── Makefile                    # Makefile
-├── README.md                   # Описание проекта
-└── LICENSE                     # Лицензия
+# Command Line Interface (CLI) API Documentation
+
+## Overview
+
+CLI API предоставляет интерфейс для разработки и интеграции команд командной строки в симулятор коммутатора.
+
+## Компоненты CLI API
+
+### CLI Engine API
+
+#### Функции
+
+```c
+cli_status_t cli_init(cli_config_t *config);
+cli_status_t cli_register_command(const char *command, const char *help, cli_handler_t handler);
+cli_status_t cli_register_command_group(const char *group, const char *help);
+cli_status_t cli_register_subcommand(const char *group, const char *command, const char *help, cli_handler_t handler);
+cli_status_t cli_start(void);
+cli_status_t cli_stop(void);
+cli_status_t cli_execute_command(const char *command_line, cli_output_t *output);
+```
+
+#### Типы данных
+
+```c
+typedef struct {
+    bool telnet_enabled;
+    uint16_t telnet_port;
+    bool local_console_enabled;
+    uint32_t history_size;
+    const char *prompt;
+} cli_config_t;
+
+typedef struct {
+    char *buffer;
+    uint32_t buffer_size;
+    uint32_t length;
+} cli_output_t;
+
+typedef cli_status_t (*cli_handler_t)(int argc, char **argv, cli_output_t *output);
+```
+
+### CLI Integration API
+
+#### Функции для интеграции CLI с Python
+
+```c
+cli_status_t cli_register_python_command(const char *command, const char *help, PyObject *callable);
+cli_status_t cli_register_python_command_group(const char *group, const char *help);
+cli_status_t cli_register_python_subcommand(const char *group, const char *command, const char *help, PyObject *callable);
+```
+
+## Стандартные группы команд
+
+| Группа команд | Описание |
+|---------------|----------|
+| show | Команды для отображения информации |
+| configure | Команды для настройки коммутатора |
+| clear | Команды для очистки статистики и таблиц |
+| debug | Команды для отладки |
+| system | Системные команды |
+
+## Обработка ошибок
+
+| Код ошибки | Описание |
+|------------|----------|
+| CLI_STATUS_SUCCESS | Операция успешна |
+| CLI_STATUS_FAILURE | Общая ошибка |
+| CLI_STATUS_INVALID_PARAMETER | Неверный параметр |
+| CLI_STATUS_COMMAND_NOT_FOUND | Команда не найдена |
+| CLI_STATUS_INSUFFICIENT_RESOURCES | Недостаточно ресурсов |
+| CLI_STATUS_PERMISSION_DENIED | Нет прав доступа |
+
+## Примеры использования
+
+### Инициализация CLI
+
+```c
+cli_config_t config;
+config.telnet_enabled = true;
+config.telnet_port = 2323;
+config.local_console_enabled = true;
+config.history_size = 100;
+config.prompt = "switch> ";
+
+cli_status_t status = cli_init(&config);
+if (status != CLI_STATUS_SUCCESS) {
+    // Handle error
+}
+
+status = cli_start();
+if (status != CLI_STATUS_SUCCESS) {
+    // Handle error
+}
+```
+
+### Регистрация команды
+
+```c
+cli_status_t show_vlan_handler(int argc, char **argv, cli_output_t *output) {
+    // Реализация команды
+    snprintf(output->buffer, output->buffer_size, "VLAN Information:\n");
+    output->length = strlen(output->buffer);
+    return CLI_STATUS_SUCCESS;
+}
+
+cli_status_t status = cli_register_command_group("show", "Display information");
+if (status != CLI_STATUS_SUCCESS) {
+    // Handle error
+}
+
+status = cli_register_subcommand("show", "vlan", "Display VLAN information", show_vlan_handler);
+if (status != CLI_STATUS_SUCCESS) {
+    // Handle error
+}
+```
+
+### Выполнение команды
+
+```c
+cli_output_t output;
+char buffer[1024];
+output.buffer = buffer;
+output.buffer_size = sizeof(buffer);
+output.length = 0;
+
+cli_status_t status = cli_execute_command("show vlan", &output);
+if (status != CLI_STATUS_SUCCESS) {
+    // Handle error
+}
+
+printf("Command output: %s\n", output.buffer);
+```
+
+### Интеграция Python-команды
+
+```c
+PyObject *show_interfaces_func = PyObject_GetAttrString(module, "show_interfaces");
+cli_status_t status = cli_register_python_subcommand("show", "interfaces", 
+    "Display interface information", show_interfaces_func);
+if (status != CLI_STATUS_SUCCESS) {
+    // Handle error
+}
+Py_DECREF(show_interfaces_func);
+```
