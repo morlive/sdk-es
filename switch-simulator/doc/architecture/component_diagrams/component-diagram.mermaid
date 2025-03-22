@@ -1,0 +1,36 @@
+flowchart TB
+    subgraph API["External Interface"]
+        PythonAPI["Python API"]
+        CLI["CLI"]
+        Scripts["Scripts"]
+    end
+    
+    subgraph Core["Core Components"]
+        SAI["SAI Interface"]
+        L2["L2 Components"]
+        L3["L3 Components"]
+        MGMT["Management"]
+    end
+    
+    subgraph Hardware["Hardware Layer"]
+        HAL["Hardware Abstraction Layer"]
+        BSP["Board Support Package"]
+        Drivers["Drivers"]
+    end
+    
+    subgraph Simulation["Simulation"]
+        SimEngine["Simulation Engine"]
+        TrafficGen["Traffic Generator"]
+    end
+    
+    API --> SAI
+    API --> MGMT
+    SAI --> L2
+    SAI --> L3
+    L2 --> HAL
+    L3 --> HAL
+    MGMT --> HAL
+    HAL --> BSP
+    BSP --> Drivers
+    Drivers --> SimEngine
+    TrafficGen --> SimEngine
